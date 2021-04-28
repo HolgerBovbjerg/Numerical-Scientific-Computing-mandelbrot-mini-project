@@ -46,16 +46,27 @@ def mandelbrot_numba(c, T, I):
                 n[i, j] += 1
     return n/I
 
-def mandelbrot_parallel_vector(c, T, I, processors, blockno, blocksize):
+def mandelbrot_vector_parallel(params):
+    c = params[0]
+    T = params[1]
+    I = params[2]
+    z = np.zeros_like(c)
+    n = np.zeros_like(c, dtype=int)
+    ind = np.full_like(c, True, dtype=bool)
+    while np.any(np.abs(z) <= T) and np.all(n < I):
+        z[ind] = np.add(np.multiply(z[ind], z[ind]), c[ind])
+        ind[np.abs(z) > T] = False
+        n[ind] += 1
+    return n/I
+
+
+def mandelbrot_parallel(c, T, I, processors, blockno, blocksize):
     pool = mp.Pool(processes=processors)
-    results = pool.map_async(mandelbrot_vector, [tuple(
-                                (c[blocksize*block:blocksize*block+blocksize], 
-                                 T, 
-                                 I)
-                                ) for block in range(blockno)]
-        )
+    iterable = [tuple((c[blocksize*block:blocksize*block+blocksize],T, I)) for block in range(blockno)]
+    results = pool.apply_async(mandelbrot_vector_parallel, iterable)
+        
     pool.close()
     pool.join()
     # out_matrix = np.vstack([result.get() for result in results])
-    out_matrix = results.get()
+    out_matrix = results
     return out_matrix
