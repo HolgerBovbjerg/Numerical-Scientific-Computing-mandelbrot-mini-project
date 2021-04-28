@@ -56,13 +56,13 @@ if __name__ == "__main__":
     print(f'Execution time:{naive_time} seconds')
     
     # plt.imshow(heatmap, cmap='hot', interpolation='nearest',extent=[-2, 1, -1.5, 1.5])
-    
+
     # print("Vectorized implementation")
     # numIter = 10
     # start = time.time()
     # for i in range(numIter):
     #     heatmap = mf.mandelbrot_vector(C,T,I)
-        
+
     # vector_time = (time.time() - start)/numIter
     # print(f'Execution time:{vector_time} seconds')
     # plt.imshow(heatmap, cmap='hot', interpolation='nearest',extent=[-2, 1, -1.5, 1.5])
