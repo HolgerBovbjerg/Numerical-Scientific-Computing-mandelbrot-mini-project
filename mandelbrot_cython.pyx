@@ -42,12 +42,16 @@ def mandelbrot_naive_cython(np.ndarray[cpl_t,ndim=2] c, int T, int I):
 @cython.boundscheck(False) # compiler directive
 @cython.wraparound(False) # compiler directive
 def mandelbrot_vector_cython(data: list):
-    c = data[0]
-    cdef float T = data[1]
+    dim = data[0].shape
+    cdef int x,y
+    x = dim[0]
+    y = dim[1]
+    cdef np.ndarray[cpl_t,ndim=2] c = data[0]
+    cdef  int T = data[1]
     cdef int I = data[2]
-    z = np.zeros_like(c)
-    n = np.zeros_like(c, dtype=int)
-    ind = np.full_like(c, True, dtype=bool)
+    cdef np.ndarray[cpl_t, ndim=2] z = np.zeros((x,y),dtype=complex)
+    cdef np.ndarray[int, ndim=2] n = np.zeros((x,y), dtype=int)
+    cdef np.ndarray[np.uint8_t, ndim = 2, cast=True] ind = np.full((x,y), True, dtype=bool)
     while np.any(np.abs(z) <= T) and np.all(n < I):
         z[ind] = np.add(np.multiply(z[ind], z[ind]), c[ind])
         ind[np.abs(z) > T] = False
