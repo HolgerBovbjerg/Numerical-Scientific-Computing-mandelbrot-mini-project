@@ -65,16 +65,16 @@ def mandelbrot_parallel_vector(c, T, I, processors, blockno, blocksize):
 
 
 def mandelbrot_GPU(c, T, I):
-    result_matrix = np.empty_like(c).astype(np.float64)
+    result_matrix = np.empty(c.shape).astype(np.float64)
 
     # Set up the GPU stuff
     # Create a context and choose device interactively
-    ctx = cl.create_some_context(interactive=True)
+    # ctx = cl.create_some_context(interactive=True)
 
-    # If interactive mode does not work, use this snippet instead.
-    # platform = cl.get_platforms()[0]
-    # my_device = platform.get_devices()[0]
-    # ctx = cl.Context([my_device])
+    # If interactive mode does not work, use this snippet to choose manually instead.
+    platform = cl.get_platforms()[0]
+    my_device = platform.get_devices()[0]
+    ctx = cl.Context([my_device])
 
     queue = cl.CommandQueue(ctx)
 
@@ -90,7 +90,7 @@ def mandelbrot_GPU(c, T, I):
     mandelbrot.set_scalar_arg_dtypes([None, None, np.int32, np.int32])
     mandelbrot(
         queue,  # Command queue
-        (50, 50),  # Global grid size
+        c.shape,  # Global grid size
         None,  # Work group size
         c_gpu,  # param 0
         result_g,  # param 1
