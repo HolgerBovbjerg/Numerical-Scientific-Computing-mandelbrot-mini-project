@@ -7,13 +7,22 @@ Created on Thu Feb 25 10:18:40 2021
 
 import numpy as np
 import multiprocessing as mp
-import matplotlib.pyplot as plt
 import numba
 from numba import jit
 import pyopencl as cl
 
 
-def mandelbrot_naive(c, T, I):
+def mandelbrot_naive(c: np.ndarray, T: int, I: int):
+    '''
+    Function that calculates all M(c) values in the c-mesh given.
+    Implemented the naive python way with nested for-loops that calculates
+    each M(c) sequentially using the mandelbrot definition.
+
+    :param c: c-mesh containing segment of the complex plane
+    :param T: Threshold value used to determine if point is in Mandelbrot set
+    :param I: Maximum number of iterations used to determine if point is in Mandelbrot set.
+    :return: np.ndarray with M(c) values for each point in c.
+    '''
     n = np.zeros_like(c, dtype=int)
     dim = c.shape
     for i in range(dim[0]):
@@ -24,8 +33,23 @@ def mandelbrot_naive(c, T, I):
                 n[i, j] += 1
     return n / I
 
+    # def mandelbrot_vector(c: np.ndarray, T: int, I: int):
+    '''
+    Function that calculates the M(c) values in the c-mesh given.
+    Implemented in a vectorised way using numpy. Here each point in the mesh is
+    updated "at once" at each iteration.
 
-def mandelbrot_vector(c, T, I):
+    :param c: c-mesh containing segment of the complex plane
+    :param T: Threshold value used to determine if point is in Mandelbrot set
+    :param I: Maximum number of iterations used to determine if point is in Mandelbrot set.
+    :return: np.ndarray with M(c) values for each point in c.
+    '''
+
+
+def mandelbrot_vector(data: list):
+    c = data[0]
+    T = data[1]
+    I = data[2]
     z = np.zeros_like(c)
     n = np.zeros_like(c, dtype=int)
     ind = np.full_like(c, True, dtype=bool)
@@ -37,7 +61,7 @@ def mandelbrot_vector(c, T, I):
 
 
 @jit(nopython=True)
-def mandelbrot_numba(c, T, I):
+def mandelbrot_numba(c: np.ndarray, T: int, I: int):
     n = np.zeros_like(c, dtype=numba.int64)
     dim = c.shape
     for i in range(dim[0]):
@@ -49,14 +73,11 @@ def mandelbrot_numba(c, T, I):
     return n / I
 
 
-def mandelbrot_parallel_vector(c, T, I, processors, blockno, blocksize):
+def mandelbrot_parallel_vector(c: np.ndarray, T: int, I: int, processors: int, blockno: int, blocksize: int):
     pool = mp.Pool(processes=processors)
-    results = pool.map_async(mandelbrot_vector, [tuple(
-        (c[blocksize * block:blocksize * block + blocksize],
-         T,
-         I)
-    ) for block in range(blockno)]
-                             )
+    data = [[c[blocksize * block:blocksize * block + blocksize], T, I] for block in range(blockno)]
+    results = pool.map_async(mandelbrot_vector, data)
+
     pool.close()
     pool.join()
     # out_matrix = np.vstack([result.get() for result in results])
@@ -64,7 +85,7 @@ def mandelbrot_parallel_vector(c, T, I, processors, blockno, blocksize):
     return out_matrix
 
 
-def mandelbrot_GPU(c, T, I):
+def mandelbrot_GPU(c: np.ndarray, T: int, I: int):
     result_matrix = np.empty(c.shape).astype(np.float64)
 
     # Set up the GPU stuff
