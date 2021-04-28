@@ -33,20 +33,20 @@ def mandelbrot_naive(c: np.ndarray, T: int, I: int):
                 n[i, j] += 1
     return n / I
 
-    # def mandelbrot_vector(c: np.ndarray, T: int, I: int):
+ 
+def mandelbrot_vector(data: list):
     '''
     Function that calculates the M(c) values in the c-mesh given.
     Implemented in a vectorised way using numpy. Here each point in the mesh is
     updated "at once" at each iteration.
-
-    :param c: c-mesh containing segment of the complex plane
-    :param T: Threshold value used to determine if point is in Mandelbrot set
-    :param I: Maximum number of iterations used to determine if point is in Mandelbrot set.
+    
+    
+    :param data: Data is a list containing:
+        :param c: c-mesh containing segment of the complex plane
+        :param T: Threshold value used to determine if point is in Mandelbrot set
+        :param I: Maximum number of iterations used to determine if point is in Mandelbrot set.
     :return: np.ndarray with M(c) values for each point in c.
     '''
-
-
-def mandelbrot_vector(data: list):
     c = data[0]
     T = data[1]
     I = data[2]
