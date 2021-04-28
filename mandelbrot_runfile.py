@@ -7,7 +7,6 @@ Created on Thu Feb 25 10:22:41 2021
 import time
 import numpy as np
 import matplotlib.pyplot as plt
-import multiprocessing as mp
 import mandelbrot_functions as mf
 
 if __name__ == "__main__":
@@ -61,7 +60,7 @@ if __name__ == "__main__":
     numIter = 1
     start = time.time()
     for i in range(numIter):
-        heatmap = mandelbrot_parallel(C,T,I, processors, 25, 500)
+        heatmap = mf.mandelbrot_parallel(C,T,I, processors, 25, 500)
     
     parallel_vector_time = (time.time() - start)/numIter
     print(f'Execution time using {processors} cores: {parallel_vector_time} seconds')
