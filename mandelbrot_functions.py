@@ -10,7 +10,7 @@ import multiprocessing as mp
 import numba
 from numba import jit
 import pyopencl as cl
-
+import mandelbrot_cython as mc
 
 def mandelbrot_naive(c: np.ndarray, T: int, I: int):
     '''
@@ -61,7 +61,7 @@ def mandelbrot_vector(data: list):
 
 
 @jit(nopython=True)
-def mandelbrot_numba(c: np.ndarray, T: int, I: int):
+def mandelbrot_numba(c, T, I):
     n = np.zeros_like(c, dtype=numba.int64)
     dim = c.shape
     for i in range(dim[0]):
@@ -81,7 +81,18 @@ def mandelbrot_parallel_vector(c: np.ndarray, T: int, I: int, processors: int, b
     pool.close()
     pool.join()
     # out_matrix = np.vstack([result.get() for result in results])
-    out_matrix = results
+    out_matrix = results.get()
+    return out_matrix
+
+def mandelbrot_parallel_numba(c: np.ndarray, T: int, I: int, processors: int, blockno: int, blocksize: int):
+    pool = mp.Pool(processes=processors)
+    data = [[c[blocksize * block:blocksize * block + blocksize], T, I] for block in range(blockno)]
+    results = pool.map_async(mandelbrot_numba, data)
+
+    pool.close()
+    pool.join()
+    # out_matrix = np.vstack([result.get() for result in results])
+    out_matrix = results.get()
     return out_matrix
 
 
@@ -121,3 +132,9 @@ def mandelbrot_GPU(c: np.ndarray, T: int, I: int):
     cl.enqueue_copy(queue, result_matrix, result_g)
 
     return result_matrix
+
+def mandelbrot_naive_cython(C, T, I):
+        return mc.mandelbrot_naive_cython(C, T, I)
+    
+def mandelbrot_vector_cython(data: list):
+        return mc.mandelbrot_vector_cython(data)
