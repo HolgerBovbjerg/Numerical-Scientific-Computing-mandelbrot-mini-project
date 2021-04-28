@@ -5,9 +5,16 @@ Created on Wed Apr 28 13:27:09 2021
 @author: holge
 """
 
+import cython
 import numpy as np
+cimport numpy as np
 
-def mandelbrot_naive_cython(c: np.ndarray, T: int, I: int):
+ctypedef np.complex128_t cpl_t
+cpl = np.complex128
+
+@cython.boundscheck(False) # compiler directive
+@cython.wraparound(False) # compiler directive
+def mandelbrot_naive_cython(np.ndarray[cpl_t,ndim=2] c, int T, int I):
     '''
     Function that calculates all M(c) values in the c-mesh given.
     Implemented the naive python way with nested for-loops that calculates
@@ -23,7 +30,7 @@ def mandelbrot_naive_cython(c: np.ndarray, T: int, I: int):
     x = dim[0]
     y = dim[1]
     # cdef int n[x][y] #
-    n = np.zeros_like(c, dtype=int)
+    cdef np.ndarray[int, ndim=2] n = np.zeros((x,y), dtype=int)
     for i in range(x):
         for j in range(y):
             z = 0 + 0j
@@ -32,6 +39,8 @@ def mandelbrot_naive_cython(c: np.ndarray, T: int, I: int):
                 n[i,j] += 1
     return n / I
 
+@cython.boundscheck(False) # compiler directive
+@cython.wraparound(False) # compiler directive
 def mandelbrot_vector_cython(data: list):
     c = data[0]
     cdef float T = data[1]
