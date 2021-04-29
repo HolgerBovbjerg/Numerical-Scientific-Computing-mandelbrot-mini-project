@@ -57,7 +57,7 @@ if __name__ == "__main__":
 
     cython_naive_time = (time.time() - start) / numIter
     print(f'Execution time: {cython_naive_time:.2f} seconds\n')
-    plt.imshow(heatmap, cmap='hot', interpolation='nearest', extent=[-2, 1, -1.5, 1.5])
+    plt.imshow(heatmap_cython_naive, cmap='hot', interpolation='nearest', extent=[-2, 1, -1.5, 1.5])
     plt.title(f'Implementation: cython naive, Time: {cython_naive_time:.2f} seconds')
     plt.show()
     
@@ -69,7 +69,7 @@ if __name__ == "__main__":
 
     cython_vector_time = (time.time() - start) / numIter
     print(f'Execution time: {cython_vector_time:.2f} seconds\n')
-    plt.imshow(heatmap, cmap='hot', interpolation='nearest', extent=[-2, 1, -1.5, 1.5])
+    plt.imshow(heatmap_cython_naive, cmap='hot', interpolation='nearest', extent=[-2, 1, -1.5, 1.5])
     plt.title(f'Implementation: cython vector, Time: {cython_vector_time:.2f} seconds')
     plt.show()
 

@@ -30,7 +30,7 @@ class TestMandelbrotMethods(unittest.TestCase):
         self.assertTrue(
             np.allclose(
                 mf.mandelbrot_naive(c, T, I),
-                mandelbrot_naive_cython(C, T, I)
+                mf.mandelbrot_naive_cython(c, T, I)
             )
         )
 
@@ -41,7 +41,7 @@ class TestMandelbrotMethods(unittest.TestCase):
         self.assertTrue(
             np.allclose(
                 mf.mandelbrot_naive(c, T, I),
-                mandelbrot_vector_cython(C, T, I)
+                mf.mandelbrot_vector_cython([c, T, I])
             )
         )
 
@@ -52,7 +52,7 @@ class TestMandelbrotMethods(unittest.TestCase):
         self.assertTrue(
             np.allclose(
                 mf.mandelbrot_naive(c, T, I),
-                mf.mandelbrot_parallel_vector(C, T, I, 12, 20, 5)
+                mf.mandelbrot_parallel_vector(c, T, I, 12, 20, 5)
             )
         )
 
