@@ -9,6 +9,7 @@ import numpy as np
 import multiprocessing as mp
 import numba
 from numba import jit
+import matplotlib.pyplot as plt
 import pyopencl as cl
 import mandelbrot_cython as mc
 
@@ -61,7 +62,10 @@ def mandelbrot_vector(data: list):
 
 
 @jit(nopython=True)
-def mandelbrot_numba(c, T, I):
+def mandelbrot_numba(data: tuple):
+    c = data[0]
+    T = data[1]
+    I = data[2]
     n = np.zeros_like(c, dtype=numba.int64)
     dim = c.shape
     for i in range(dim[0]):
@@ -80,20 +84,19 @@ def mandelbrot_parallel_vector(c: np.ndarray, T: int, I: int, processors: int, b
 
     pool.close()
     pool.join()
-    # out_matrix = np.vstack([result.get() for result in results])
     out_matrix = results.get()
     return out_matrix
 
-def mandelbrot_parallel_numba(c: np.ndarray, T: int, I: int, processors: int, blockno: int, blocksize: int):
-    pool = mp.Pool(processes=processors)
-    data = [[c[blocksize * block:blocksize * block + blocksize], T, I] for block in range(blockno)]
-    results = pool.map_async(mandelbrot_numba, data)
 
-    pool.close()
-    pool.join()
-    # out_matrix = np.vstack([result.get() for result in results])
-    out_matrix = results.get()
-    return out_matrix
+# def mandelbrot_parallel_numba(c: np.ndarray, T: int, I: int, processors: int, blockno: int, blocksize: int):
+#     pool = mp.Pool(processes=processors)
+#     data = [[c[blocksize * block:blocksize * block + blocksize], T, I] for block in range(blockno)]
+#     results = pool.map_async(mandelbrot_numba, tuple(data))
+
+#     pool.close()
+#     pool.join()
+#     out_matrix = results.get()
+#     return out_matrix
 
 
 def mandelbrot_GPU(c: np.ndarray, T: int, I: int):
@@ -133,8 +136,31 @@ def mandelbrot_GPU(c: np.ndarray, T: int, I: int):
 
     return result_matrix
 
+
 def mandelbrot_naive_cython(C, T, I):
         return mc.mandelbrot_naive_cython(C, T, I)
+ 
     
 def mandelbrot_vector_cython(data: list):
         return mc.mandelbrot_vector_cython(data)
+
+def export_figure_matplotlib(arr, f_name, dpi=200, resize_fact=1, plt_show=False):
+    """
+    Export array as figure in original resolution
+    :param arr: array of image to save in original resolution
+    :param f_name: name of file where to save figure
+    :param resize_fact: resize facter wrt shape of arr, in (0, np.infty)
+    :param dpi: dpi of your screen
+    :param plt_show: show plot or not
+    """
+    fig = plt.figure(frameon=False)
+    fig.set_size_inches(arr.shape[1]/dpi, arr.shape[0]/dpi)
+    ax = plt.Axes(fig, [0., 0., 1., 1.])
+    ax.set_axis_off()
+    fig.add_axes(ax)
+    ax.imshow(arr)
+    plt.savefig(f_name, dpi=(dpi * resize_fact))
+    if plt_show:
+        plt.show()
+    else:
+        plt.close()
