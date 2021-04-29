@@ -19,7 +19,6 @@ def mandelbrot_naive_cython(np.ndarray[cpl_t,ndim=2] c, int T, int I):
     cdef int x,y
     x = dim[0]
     y = dim[1]
-    # cdef int n[x][y] #
     cdef np.ndarray[int, ndim=2] n = np.zeros((x,y), dtype=int)
     for i in range(x):
         for j in range(y):
