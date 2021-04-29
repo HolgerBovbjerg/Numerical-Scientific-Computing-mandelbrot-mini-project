@@ -55,10 +55,11 @@ def mandelbrot_vector(data: list):
     n = np.zeros_like(c, dtype=int)
     ind = np.full_like(c, True, dtype=bool)
     while np.any(np.abs(z) <= T) and np.all(n < I):
-        z[ind] = np.add(np.multiply(z[ind], z[ind]), c[ind])
-        ind[np.abs(z) > T] = False
         n[ind] += 1
-    return n / I
+        z[ind] = np.add(np.multiply(z[ind], z[ind]), c[ind])
+        ind[np.abs(z) >= T] = False
+
+    return np.real(n) / I
 
 
 @jit(nopython=True)
