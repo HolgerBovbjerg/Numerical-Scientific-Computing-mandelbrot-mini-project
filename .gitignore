@@ -2,3 +2,6 @@
 .vscode/
 .vsls.json
 .idea/
+.__pycache__/
+.build/
+.dask-worker-space/
