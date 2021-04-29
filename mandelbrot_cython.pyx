@@ -15,16 +15,6 @@ cpl = np.complex128
 @cython.boundscheck(False) # compiler directive
 @cython.wraparound(False) # compiler directive
 def mandelbrot_naive_cython(np.ndarray[cpl_t,ndim=2] c, int T, int I):
-    '''
-    Function that calculates all M(c) values in the c-mesh given.
-    Implemented the naive python way with nested for-loops that calculates
-    each M(c) sequentially using the mandelbrot definition.
-
-    :param c: c-mesh containing segment of the complex plane
-    :param T: Threshold value used to determine if point is in Mandelbrot set
-    :param I: Maximum number of iterations used to determine if point is in Mandelbrot set.
-    :return: np.ndarray with M(c) values for each point in c.
-    '''
     dim = c.shape
     cdef int x,y
     x = dim[0]

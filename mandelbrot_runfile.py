@@ -12,71 +12,72 @@ import mandelbrot_functions as mf
 
 if __name__ == "__main__":
     I = 100
-    T = 10
+    T = 2
     range0 = [-2,1.5]
     range1 = [-1.5,1.5]
-    res = [400,400]
+    res = [4096*5,4096*5]
     
     Re = np.array([np.linspace(-2, 1, res[0]), ] * res[0])
     Im = np.array([np.linspace(-1.5, 1.5, res[1]), ] * res[1]).transpose()
     C = Re + Im * 1j
   
-    print("Naive implementation")
-    numIter = 1
-    start = time.time()
-    for i in range(numIter):    
-        heatmap = mf.mandelbrot_naive(C,T,I)
+    # print("Naive implementation")
+    # numIter = 1
+    # start = time.time()
+    # for i in range(numIter):    
+    #     heatmap = mf.mandelbrot_naive(C,T,I)
         
-    naive_time = (time.time() - start)/numIter
-    print(f'Execution time:{naive_time} seconds')    
-    plt.imshow(heatmap, cmap='hot', interpolation='nearest',extent=[-2, 1, -1.5, 1.5])
-    plt.show()
+    # naive_time = (time.time() - start)/numIter
+    # print(f'Execution time:{naive_time} seconds')    
+    # plt.imshow(heatmap, cmap='hot', interpolation='nearest',extent=[-2, 1, -1.5, 1.5])
+    # plt.show()
 
-    print("Vectorized implementation")
-    numIter = 1
-    start = time.time()
-    for i in range(numIter):
-        heatmap = mf.mandelbrot_vector([C,T,I])
+    # print("Vectorized implementation")
+    # numIter = 1
+    # start = time.time()
+    # for i in range(numIter):
+    #     heatmap = mf.mandelbrot_vector([C,T,I])
 
-    vector_time = (time.time() - start)/numIter
-    print(f'Execution time:{vector_time} seconds')
-    plt.imshow(heatmap, cmap='hot', interpolation='nearest',extent=[-2, 1, -1.5, 1.5])
-    plt.show()
+    # vector_time = (time.time() - start)/numIter
+    # print(f'Execution time:{vector_time} seconds')
+    # plt.imshow(heatmap, cmap='hot', interpolation='nearest',extent=[-2, 1, -1.5, 1.5])
+    # plt.show()
     
     print("Numba implementation")
     # Run once to compile numba code
-    mf.mandelbrot_numba(C,T,I) 
+    mf.mandelbrot_numba(tuple((C,T,I)))
     numIter = 1
     start = time.time()
     for i in range(numIter):
-        heatmap = mf.mandelbrot_numba(C,T,I)
+        heatmap = mf.mandelbrot_numba(tuple((C,T,I)))
     
     numba_time = (time.time() - start)/numIter
     print(f'Execution time:{numba_time} seconds')
-    plt.imshow(heatmap, cmap='hot', interpolation='nearest', extent=[-2, 1, -1.5, 1.5])
-    plt.show()
+    # plt.imshow(heatmap, cmap='hot', interpolation='nearest', extent=[-2, 1, -1.5, 1.5])
+    # plt.show()
+    mf.export_figure_matplotlib(heatmap, "20K_Mandelbrot", 146, resize_fact=1, plt_show=False)
     
-    print("Cython implementation using naive function")
-    numIter = 1
-    start = time.time()
-    for i in range(numIter):
-        heatmap = mf.mandelbrot_naive_cython(C, T, I)
+    # print("Cython implementation using naive function")
+    # numIter = 1
+    # start = time.time()
+    # for i in range(numIter):
+    #     heatmap = mf.mandelbrot_naive_cython(C, T, I)
 
-    cython_time = (time.time() - start) / numIter
-    print(f'Execution time: {cython_time} seconds')
-    plt.imshow(heatmap, cmap='hot', interpolation='nearest', extent=[-2, 1, -1.5, 1.5])
-    plt.show()
+    # cython_time = (time.time() - start) / numIter
+    # print(f'Execution time: {cython_time} seconds')
+    # plt.imshow(heatmap, cmap='hot', interpolation='nearest', extent=[-2, 1, -1.5, 1.5])
+    # plt.show()
     
-    print("Cython implementation using vector function")
-    numIter = 1
-    start = time.time()
-    for i in range(numIter):
-        heatmap = mf.mandelbrot_vector_cython([C, T, I])
+    # print("Cython implementation using vector function")
+    # numIter = 1
+    # start = time.time()
+    # for i in range(numIter):
+    #     heatmap = mf.mandelbrot_vector_cython([C, T, I])
 
-    cython_time = (time.time() - start) / numIter
-    print(f'Execution time: {cython_time} seconds')
-    plt.imshow(heatmap, cmap='hot', interpolation='nearest', extent=[-2, 1, -1.5, 1.5])
-    plt.show()
+    # cython_time = (time.time() - start) / numIter
+    # print(f'Execution time: {cython_time} seconds')
+    # plt.imshow(heatmap, cmap='hot', interpolation='nearest', extent=[-2, 1, -1.5, 1.5])
+    # plt.show()
     
     # print("Parallel implementation using vector optimized function")
     # processors = 12
