@@ -170,11 +170,11 @@ def mandelbrot_gpu(c: np.ndarray, T: int, I: int):
 
 
 def mandelbrot_naive_cython(C, T, I):
-        return mc.mandelbrot_naive_cython(C, T, I)
+    return mc.mandelbrot_naive_cython(C, T, I)
  
     
 def mandelbrot_vector_cython(data: list):
-        return mc.mandelbrot_vector_cython(data)
+    return mc.mandelbrot_vector_cython(data)
 
 
 def export_figure_matplotlib(arr, f_name, dpi=200, resize_fact=1, plt_show=False):

@@ -23,6 +23,39 @@ class TestMandelbrotMethods(unittest.TestCase):
         I = 100
         self.assertTrue(np.allclose(mf.mandelbrot_naive(c, T, I), mf.mandelbrot_gpu(c, T, I)))
 
+    def test_cython_naive(self):
+        c = mf.create_mesh(50, 50)
+        T = 2
+        I = 100
+        self.assertTrue(
+            np.allclose(
+                mf.mandelbrot_naive(c, T, I),
+                mandelbrot_naive_cython(C, T, I)
+            )
+        )
+
+    def test_cython_vector(self):
+        c = mf.create_mesh(50, 50)
+        T = 2
+        I = 100
+        self.assertTrue(
+            np.allclose(
+                mf.mandelbrot_naive(c, T, I),
+                mandelbrot_vector_cython(C, T, I)
+            )
+        )
+
+    def test_parallel(self):
+        c = mf.create_mesh(100, 100)
+        T = 2
+        I = 100
+        self.assertTrue(
+            np.allclose(
+                mf.mandelbrot_naive(c, T, I),
+                mf.mandelbrot_parallel_vector(C, T, I, 12, 20, 5)
+            )
+        )
+
 
 if __name__ == '__main__':
     unittest.main()
