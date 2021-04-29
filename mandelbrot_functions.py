@@ -12,6 +12,8 @@ from numba import jit
 import matplotlib.pyplot as plt
 import pyopencl as cl
 import mandelbrot_cython as mc
+from dask.distributed import Client, wait
+
 
 def mandelbrot_naive(c: np.ndarray, T: int, I: int):
     '''
@@ -36,19 +38,19 @@ def mandelbrot_naive(c: np.ndarray, T: int, I: int):
 
 
 def mandelbrot_vector(data: list):
-    '''
+    """
     Function that calculates the M(c) values in the c-mesh given,
     implemented in a vectorised way using numpy.
     Here each point in the mesh is updated "at once" at each iteration.
     In order to use this function for the multiprocessing and distributed functions
     the input has been packed into a list.
-    
+
     :param data: Data is a list containing:
-        :param c: c-mesh containing segment of the complex plane
-        :param T: Threshold value used to determine if point is in Mandelbrot set
-        :param I: Maximum number of iterations used to determine if point is in Mandelbrot set.
+        c: c-mesh containing segment of the complex plane
+        T: Threshold value used to determine if point is in Mandelbrot set
+        I: Maximum number of iterations used to determine if point is in Mandelbrot set.
     :return: np.ndarray with M(c) values for each point in c.
-    '''
+    """
     c = data[0]
     T = data[1]
     I = data[2]
@@ -169,7 +171,7 @@ def mandelbrot_gpu(c: np.ndarray, T: int, I: int):
     return result_matrix
 
 
-def mandelbrot_naive_cython(C, T, I):
+def mandelbrot_naive_cython(c, T, I):
     '''
     Function that calculates all M(c) values in the c-mesh given.
     Implemented the naive python way with nested for-loops that calculates
@@ -181,9 +183,9 @@ def mandelbrot_naive_cython(C, T, I):
     :param I: Maximum number of iterations used to determine if point is in Mandelbrot set.
     :return: np.ndarray with M(c) values for each point in c.
     '''
-    return mc.mandelbrot_naive_cython(C, T, I)
- 
-    
+    return mc.mandelbrot_naive_cython(c, T, I)
+
+
 def mandelbrot_vector_cython(data: list):
     '''
     Function that calculates the M(c) values in the c-mesh given,
@@ -194,12 +196,46 @@ def mandelbrot_vector_cython(data: list):
     the input has been packed into a list.
     
     :param data: Data is a list containing:
-        :param c: c-mesh containing segment of the complex plane
-        :param T: Threshold value used to determine if point is in Mandelbrot set
-        :param I: Maximum number of iterations used to determine if point is in Mandelbrot set.
+        c: c-mesh containing segment of the complex plane
+        T: Threshold value used to determine if point is in Mandelbrot set
+        I: Maximum number of iterations used to determine if point is in Mandelbrot set.
     :return: np.ndarray with M(c) values for each point in c.
     '''
     return mc.mandelbrot_vector_cython(data)
+
+
+def mandelbrot_distributed(c: np.ndarray, T: int, I: int, processes: int, blockno: int, blocksize: int):
+    client = Client(n_workers=processes)
+
+    data = [[c[blocksize * block:blocksize * block + blocksize], T, I] for block in range(blockno)]
+    counts = client.map(mandelbrot_vector, data)
+    client.gather(counts)
+    rows = np.vstack([count.result() for count in counts])
+
+    wait(rows)
+    client.close()
+
+    return rows
+
+
+def distributed_vector_mandel(processes, c_mesh, max_iterations, threshold_value):
+    client = Client(n_workers=processes)
+    counts = []
+
+    for i in range(16):
+        # Send the data to the cluster as this is best practice for large data.
+        big_future = client.scatter(c_mesh[250 * i:250 * i + 250])
+        counts.append(
+            client.submit(mandelbrot_vector, big_future, max_iterations, threshold_value)
+        )
+
+    client.gather(counts)
+    rows = np.vstack([count.result()[0] for count in counts])
+    wait(rows)
+
+    client.close()
+
+    return rows
 
 
 def export_figure_matplotlib(arr, f_name, dpi=200, resize_fact=1, plt_show=False):
@@ -212,7 +248,7 @@ def export_figure_matplotlib(arr, f_name, dpi=200, resize_fact=1, plt_show=False
     :param plt_show: show plot or not
     """
     fig = plt.figure(frameon=False)
-    fig.set_size_inches(arr.shape[1]/dpi, arr.shape[0]/dpi)
+    fig.set_size_inches(arr.shape[1] / dpi, arr.shape[0] / dpi)
     ax = plt.Axes(fig, [0., 0., 1., 1.])
     ax.set_axis_off()
     fig.add_axes(ax)
