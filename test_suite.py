@@ -71,14 +71,14 @@ class TestMandelbrotMethods(unittest.TestCase):
     #         )
     #     )
 
-    def test_distributed(self):
+    def test_distributed_vector(self):
         c = mf.create_mesh(4096, 4096)
         T = 2
         I = 100
         self.assertTrue(
             np.allclose(
                 mf.mandelbrot_gpu(c, T, I),
-                mf.mandelbrot_distributed(c, T, I, 12, 512, 8)
+                mf.mandelbrot_distributed_vector(c, T, I, 12, 512, 8)
             )
         )
 

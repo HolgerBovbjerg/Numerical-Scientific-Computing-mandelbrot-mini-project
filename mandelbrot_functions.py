@@ -17,7 +17,7 @@ from dask.distributed import Client, wait
 
 def mandelbrot_naive(c: np.ndarray, T: int, I: int):
     """
-    Function that calculates all M(c) values in the c-mesh given.
+    Calculates all M(c) values in the c-mesh given.
     Implemented the naive python way with nested for-loops that calculates
     each M(c) sequentially using the mandelbrot definition.
 
@@ -38,7 +38,7 @@ def mandelbrot_naive(c: np.ndarray, T: int, I: int):
 
 def mandelbrot_vector(data: list):
     """
-    Function that calculates the M(c) values in the c-mesh given,
+    Calculates the M(c) values in the c-mesh given,
     implemented in a vectorised way using numpy.
     Here each point in the mesh is updated "at once" at each iteration.
     In order to use this function for the multiprocessing and distributed functions
@@ -67,7 +67,7 @@ def mandelbrot_vector(data: list):
 @jit(nopython=True)
 def mandelbrot_numba(c: np.ndarray, T: int, I: int):
     """
-    Function that calculates the M(c) values in the c-mesh given,
+    Calculates the M(c) values in the c-mesh given,
     implemented using the numba library on the naive implementation.
     Numba analyzes and optimizes the code before compiling it to a
     machine code version tailored to the CPU.
@@ -91,7 +91,7 @@ def mandelbrot_numba(c: np.ndarray, T: int, I: int):
 
 def mandelbrot_parallel_vector(c: np.ndarray, T: int, I: int, processors: int, blockno: int, blocksize: int):
     """
-    Function that calculates the M(c) values in the c-mesh given,
+    Calculates the M(c) values in the c-mesh given,
     using multiprocessing to do calculate in parallel.
     The functions uses the python multiprocessing library and assigns work
     with the asynchronous map function.
@@ -119,7 +119,7 @@ def mandelbrot_parallel_vector(c: np.ndarray, T: int, I: int, processors: int, b
 
 def mandelbrot_gpu(c: np.ndarray, T: int, I: int):
     """
-    Function that calculates the M(c) values in the c-mesh given,
+    Calculates the M(c) values in the c-mesh given,
     using GPU-processing.
     This function uses the PyOpenCL library for python.
     The calculations are performed by applying a kernel written
@@ -170,9 +170,9 @@ def mandelbrot_gpu(c: np.ndarray, T: int, I: int):
     return result_matrix
 
 
-def mandelbrot_naive_cython(C, T, I):
+def mandelbrot_naive_cython(c, T, I):
     """
-    Function that calculates all M(c) values in the c-mesh given.
+    Calculates all M(c) values in the c-mesh given.
     Implemented the naive python way with nested for-loops that calculates
     each M(c) sequentially using the mandelbrot definition. The function is
     then optimized using cython (see mandelbrot_cython.pyx).
@@ -182,18 +182,17 @@ def mandelbrot_naive_cython(C, T, I):
     :param I: Maximum number of iterations used to determine if point is in Mandelbrot set.
     :return: np.ndarray with M(c) values for each point in c.
     """
-    return mc.mandelbrot_naive_cython(C, T, I)
- 
-    
+    return mc.mandelbrot_naive_cython(c, T, I)
+
+
 def mandelbrot_vector_cython(data: list):
     """
-    Function that calculates the M(c) values in the c-mesh given,
-    implemented in a vectorised way using numpy. This is then optmized using
+    Calculates the M(c) values in the c-mesh given,
+    implemented in a vectorised way using numpy. This is then optimized using
     cython (see mandelbrot_cython.pyx).
     Here each point in the mesh is updated "at once" at each iteration.
     In order to use this function for the multiprocessing and distributed functions
-    the input has been packed into a list. The function is
-    then optimized using cython (see mandelbrot_cython.pyx).
+    the input has been packed into a list.
 
     :param data: Data is a list containing:
         c: c-mesh containing segment of the complex plane
@@ -204,38 +203,42 @@ def mandelbrot_vector_cython(data: list):
     return mc.mandelbrot_vector_cython(data)
 
 
-def mandelbrot_distributed(c: np.ndarray, T: int, I: int, processes: int, blockno: int, blocksize: int):
+# noinspection PyTypeChecker
+def mandelbrot_distributed_vector(c: np.ndarray, T: int, I: int, processes: int, blockno: int, blocksize: int):
+    """
+    Calculates the M(c) values in the c-mesh given, by dividing the mesh
+    into blocks and then sending each block out to a node in distributed
+    network.
+    The vectorized implementation of the Mandelbrot calculation is used for
+    the calculations on the nodes.
+    (NOTE: This function distributes the blocks to nodes on the local machine
+    similarly to the multiprocessing implementation. )
+
+    :param c: c-mesh containing segment of the complex plane
+    :param T: Threshold value used to determine if point is in Mandelbrot set
+    :param I: Maximum number of iterations used to determine if point is in Mandelbrot set.
+    :param processes: Number of workers to divide the workload amongst.
+    :param blockno: Number of blocks to divide the c-mesh into.
+    :param blocksize: The amount of rows of c-mesh in a single block.
+    :return: np.ndarray with M(c) values for each point in c-mesh.
+    """
     client = Client(n_workers=processes)
+    results = []
 
-    data = [[c[blocksize * block:blocksize * block + blocksize], T, I] for block in range(blockno)]
-    counts = client.map(mandelbrot_vector, data)
-    client.gather(counts)
-    rows = np.vstack([count.result() for count in counts])
-
-    wait(rows)
-    client.close()
-
-    return rows
-
-
-def distributed_vector_mandel(processes, c_mesh, max_iterations, threshold_value):
-    client = Client(n_workers=processes)
-    counts = []
-
-    for i in range(16):
+    for block in range(blockno):
         # Send the data to the cluster as this is best practice for large data.
-        big_future = client.scatter(c_mesh[250 * i:250 * i + 250])
-        counts.append(
-            client.submit(mandelbrot_vector, big_future, max_iterations, threshold_value)
+        data = [c[blocksize * block:blocksize * block + blocksize], T, I]
+        big_future = client.scatter(data)
+        results.append(
+            client.submit(mandelbrot_vector, big_future)
         )
 
-    client.gather(counts)
-    rows = np.vstack([count.result()[0] for count in counts])
-    wait(rows)
-
+    client.gather(results)
+    out_matrix = np.vstack([result.result() for result in results])
+    wait(out_matrix)
     client.close()
 
-    return rows
+    return out_matrix
 
 
 def export_figure_matplotlib(arr, f_name, dpi=200, resize_fact=1, plt_show=False):
@@ -261,8 +264,8 @@ def export_figure_matplotlib(arr, f_name, dpi=200, resize_fact=1, plt_show=False
 
 
 def create_mesh(real_points: int, imag_points: int):
-    """
-    Function that generates a mesh of complex points from the complex
+    '''
+    Generates a mesh of complex points from the complex
     plane, in the region: -2 < Re < 1  and -1.5 < Im < 1.5
     The resolution of the mesh is determined by the input values.
     :param real_points: Number of points on the real axis
