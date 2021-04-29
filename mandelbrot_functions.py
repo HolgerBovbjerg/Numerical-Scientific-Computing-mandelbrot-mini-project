@@ -170,11 +170,36 @@ def mandelbrot_gpu(c: np.ndarray, T: int, I: int):
 
 
 def mandelbrot_naive_cython(C, T, I):
-        return mc.mandelbrot_naive_cython(C, T, I)
+    '''
+    Function that calculates all M(c) values in the c-mesh given.
+    Implemented the naive python way with nested for-loops that calculates
+    each M(c) sequentially using the mandelbrot definition. The function is
+    then optimized using cython (see mandelbrot_cython.pyx).
+
+    :param c: c-mesh containing segment of the complex plane
+    :param T: Threshold value used to determine if point is in Mandelbrot set
+    :param I: Maximum number of iterations used to determine if point is in Mandelbrot set.
+    :return: np.ndarray with M(c) values for each point in c.
+    '''
+    return mc.mandelbrot_naive_cython(C, T, I)
  
     
 def mandelbrot_vector_cython(data: list):
-        return mc.mandelbrot_vector_cython(data)
+    '''
+    Function that calculates the M(c) values in the c-mesh given,
+    implemented in a vectorised way using numpy. This is then optmized using
+    cython (see mandelbrot_cython.pyx).
+    Here each point in the mesh is updated "at once" at each iteration.
+    In order to use this function for the multiprocessing and distributed functions
+    the input has been packed into a list.
+    
+    :param data: Data is a list containing:
+        :param c: c-mesh containing segment of the complex plane
+        :param T: Threshold value used to determine if point is in Mandelbrot set
+        :param I: Maximum number of iterations used to determine if point is in Mandelbrot set.
+    :return: np.ndarray with M(c) values for each point in c.
+    '''
+    return mc.mandelbrot_vector_cython(data)
 
 
 def export_figure_matplotlib(arr, f_name, dpi=200, resize_fact=1, plt_show=False):
