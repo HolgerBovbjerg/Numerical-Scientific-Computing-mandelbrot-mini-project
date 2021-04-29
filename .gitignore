@@ -1,9 +1,4 @@
-# Default ignored files
-/shelf/
-/workspace.xml
-# Datasource local storage ignored files
-/../../../../../:\Code\GIT\Numerical-Scientific-Computing-mandelbrot-mini-project\.idea/dataSources/
-/dataSources.local.xml
-C:\Code\GIT\Numerical-Scientific-Computing-mandelbrot-mini-project\__pycache__
-# Editor-based HTTP Client requests
-/httpRequests/
+*.pyc
+.vscode/
+.vsls.json
+.idea/
