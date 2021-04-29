@@ -44,6 +44,6 @@ def mandelbrot_vector_cython(data: list):
     cdef np.ndarray[np.uint8_t, ndim = 2, cast=True] ind = np.full((x,y), True, dtype=bool)
     while np.any(np.abs(z) <= T) and np.all(n < I):
         z[ind] = np.add(np.multiply(z[ind], z[ind]), c[ind])
-        ind[np.abs(z) > T] = False
         n[ind] += 1
+        ind[np.abs(z) > T] = False
     return n / I

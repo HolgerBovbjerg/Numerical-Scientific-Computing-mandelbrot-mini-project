@@ -45,7 +45,7 @@ if __name__ == "__main__":
     numba_time = (time.time() - start) / numIter
     print(f'Execution time:{numba_time:.2f} seconds\n')
     plt.imshow(heatmap_numba, cmap='hot', extent=[-2, 1, -1.5, 1.5])
-    plt.title(f'Implementation: numba, Time: {numba_time:.2f} seconds')
+    plt.title(f'Implementation: Numba, Time: {numba_time:.2f} seconds')
     plt.show()
     # mf.export_figure_matplotlib(heatmap, "20K_Mandelbrot", 146, resize_fact=1, plt_show=False)
     
@@ -58,7 +58,7 @@ if __name__ == "__main__":
     cython_naive_time = (time.time() - start) / numIter
     print(f'Execution time: {cython_naive_time:.2f} seconds\n')
     plt.imshow(heatmap_cython_naive, cmap='hot', interpolation='nearest', extent=[-2, 1, -1.5, 1.5])
-    plt.title(f'Implementation: cython naive, Time: {cython_naive_time:.2f} seconds')
+    plt.title(f'Implementation: Cython naive, Time: {cython_naive_time:.2f} seconds')
     plt.show()
     
     print("Cython implementation using vector function")
@@ -70,7 +70,7 @@ if __name__ == "__main__":
     cython_vector_time = (time.time() - start) / numIter
     print(f'Execution time: {cython_vector_time:.2f} seconds\n')
     plt.imshow(heatmap_cython_naive, cmap='hot', interpolation='nearest', extent=[-2, 1, -1.5, 1.5])
-    plt.title(f'Implementation: cython vector, Time: {cython_vector_time:.2f} seconds')
+    plt.title(f'Implementation: Cython vector, Time: {cython_vector_time:.2f} seconds')
     plt.show()
 
 
