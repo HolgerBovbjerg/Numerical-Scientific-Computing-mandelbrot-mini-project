@@ -9,19 +9,34 @@ class TestMandelbrotMethods(unittest.TestCase):
         c = mf.create_mesh(50, 50)
         T = 2
         I = 100
-        self.assertTrue(np.allclose(mf.mandelbrot_naive(c, T, I), mf.mandelbrot_vector([c, T, I])))
+        self.assertTrue(
+            np.allclose(
+                mf.mandelbrot_naive(c, T, I),
+                mf.mandelbrot_vector([c, T, I])
+            )
+        )
 
     def test_numba(self):
         c = mf.create_mesh(50, 50)
         T = 2
         I = 100
-        self.assertTrue(np.allclose(mf.mandelbrot_naive(c, T, I), mf.mandelbrot_numba(c, T, I)))
+        self.assertTrue(
+            np.allclose(
+                mf.mandelbrot_naive(c, T, I),
+                mf.mandelbrot_numba(c, T, I)
+            )
+        )
 
     def test_gpu(self):
         c = mf.create_mesh(50, 50)
         T = 2
         I = 100
-        self.assertTrue(np.allclose(mf.mandelbrot_naive(c, T, I), mf.mandelbrot_gpu(c, T, I)))
+        self.assertTrue(
+            np.allclose(
+                mf.mandelbrot_naive(c, T, I),
+                mf.mandelbrot_gpu(c, T, I)
+            )
+        )
 
     def test_cython_naive(self):
         c = mf.create_mesh(50, 50)
