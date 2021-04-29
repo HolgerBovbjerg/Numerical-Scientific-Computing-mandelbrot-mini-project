@@ -16,7 +16,7 @@ from dask.distributed import Client, wait
 
 
 def mandelbrot_naive(c: np.ndarray, T: int, I: int):
-    '''
+    """
     Function that calculates all M(c) values in the c-mesh given.
     Implemented the naive python way with nested for-loops that calculates
     each M(c) sequentially using the mandelbrot definition.
@@ -25,7 +25,7 @@ def mandelbrot_naive(c: np.ndarray, T: int, I: int):
     :param T: Threshold value used to determine if point is in Mandelbrot set
     :param I: Maximum number of iterations used to determine if point is in Mandelbrot set.
     :return: np.ndarray with M(c) values for each point in c.
-    '''
+    """
     n = np.zeros_like(c, dtype=int)
     dim = c.shape
     for i in range(dim[0]):
@@ -35,7 +35,6 @@ def mandelbrot_naive(c: np.ndarray, T: int, I: int):
                 z = z * z + c[i, j]
                 n[i, j] += 1
     return n / I
-
 
 def mandelbrot_vector(data: list):
     """
@@ -67,7 +66,7 @@ def mandelbrot_vector(data: list):
 
 @jit(nopython=True)
 def mandelbrot_numba(c: np.ndarray, T: int, I: int):
-    '''
+    """
     Function that calculates the M(c) values in the c-mesh given,
     implemented using the numba library on the naive implementation.
     Numba analyzes and optimizes the code before compiling it to a
@@ -78,7 +77,7 @@ def mandelbrot_numba(c: np.ndarray, T: int, I: int):
     :param T: Threshold value used to determine if point is in Mandelbrot set
     :param I: Maximum number of iterations used to determine if point is in Mandelbrot set.
     :return: np.ndarray with M(c) values for each point in c.
-    '''
+    """
     n = np.zeros_like(c, dtype=numba.int64)
     dim = c.shape
     for i in range(dim[0]):
@@ -91,7 +90,7 @@ def mandelbrot_numba(c: np.ndarray, T: int, I: int):
 
 
 def mandelbrot_parallel_vector(c: np.ndarray, T: int, I: int, processors: int, blockno: int, blocksize: int):
-    '''
+    """
     Function that calculates the M(c) values in the c-mesh given,
     using multiprocessing to do calculate in parallel.
     The functions uses the python multiprocessing library and assigns work
@@ -107,7 +106,7 @@ def mandelbrot_parallel_vector(c: np.ndarray, T: int, I: int, processors: int, b
     :param blockno: Number of blocks to divide the c-mesh into.
     :param blocksize: The amount of rows of c-mesh in a single block.
     :return: np.ndarray with M(c) values for each point in c-mesh.
-    '''
+    """
     pool = mp.Pool(processes=processors)
     data = [[c[blocksize * block:blocksize * block + blocksize], T, I] for block in range(blockno)]
     results = pool.map_async(mandelbrot_vector, data)
@@ -119,7 +118,7 @@ def mandelbrot_parallel_vector(c: np.ndarray, T: int, I: int, processors: int, b
 
 
 def mandelbrot_gpu(c: np.ndarray, T: int, I: int):
-    '''
+    """
     Function that calculates the M(c) values in the c-mesh given,
     using GPU-processing.
     This function uses the PyOpenCL library for python.
@@ -134,7 +133,7 @@ def mandelbrot_gpu(c: np.ndarray, T: int, I: int):
     :param T: Threshold value used to determine if point is in Mandelbrot set
     :param I: Maximum number of iterations used to determine if point is in Mandelbrot set.
     :return: np.ndarray with M(c) values for each point in c-mesh.
-    '''
+    """
     # Initialize a matrix to contain the results.
     result_matrix = np.empty(c.shape).astype(np.float64)
 
@@ -171,8 +170,8 @@ def mandelbrot_gpu(c: np.ndarray, T: int, I: int):
     return result_matrix
 
 
-def mandelbrot_naive_cython(c, T, I):
-    '''
+def mandelbrot_naive_cython(C, T, I):
+    """
     Function that calculates all M(c) values in the c-mesh given.
     Implemented the naive python way with nested for-loops that calculates
     each M(c) sequentially using the mandelbrot definition. The function is
@@ -182,25 +181,26 @@ def mandelbrot_naive_cython(c, T, I):
     :param T: Threshold value used to determine if point is in Mandelbrot set
     :param I: Maximum number of iterations used to determine if point is in Mandelbrot set.
     :return: np.ndarray with M(c) values for each point in c.
-    '''
-    return mc.mandelbrot_naive_cython(c, T, I)
-
-
+    """
+    return mc.mandelbrot_naive_cython(C, T, I)
+ 
+    
 def mandelbrot_vector_cython(data: list):
-    '''
+    """
     Function that calculates the M(c) values in the c-mesh given,
     implemented in a vectorised way using numpy. This is then optmized using
     cython (see mandelbrot_cython.pyx).
     Here each point in the mesh is updated "at once" at each iteration.
     In order to use this function for the multiprocessing and distributed functions
-    the input has been packed into a list.
-    
+    the input has been packed into a list. The function is
+    then optimized using cython (see mandelbrot_cython.pyx).
+
     :param data: Data is a list containing:
         c: c-mesh containing segment of the complex plane
         T: Threshold value used to determine if point is in Mandelbrot set
         I: Maximum number of iterations used to determine if point is in Mandelbrot set.
     :return: np.ndarray with M(c) values for each point in c.
-    '''
+    """
     return mc.mandelbrot_vector_cython(data)
 
 
@@ -261,14 +261,14 @@ def export_figure_matplotlib(arr, f_name, dpi=200, resize_fact=1, plt_show=False
 
 
 def create_mesh(real_points: int, imag_points: int):
-    '''
+    """
     Function that generates a mesh of complex points from the complex
     plane, in the region: -2 < Re < 1  and -1.5 < Im < 1.5
     The resolution of the mesh is determined by the input values.
     :param real_points: Number of points on the real axis
     :param imag_points: Number of points on the imaginary axis
     :return: 2D ndarray of complex values.
-    '''
+    """
     Re = np.array([np.linspace(-2, 1, real_points), ] * real_points)
     Im = np.array([np.linspace(-1.5, 1.5, imag_points), ] * imag_points).transpose()
     return Re + Im * 1j
