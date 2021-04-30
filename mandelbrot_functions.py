@@ -264,7 +264,7 @@ def export_figure_matplotlib(arr, f_name, dpi=200, resize_fact=1, plt_show=False
 
 
 def create_mesh(real_points: int, imag_points: int):
-    '''
+    """
     Generates a mesh of complex points from the complex
     plane, in the region: -2 < Re < 1  and -1.5 < Im < 1.5
     The resolution of the mesh is determined by the input values.
