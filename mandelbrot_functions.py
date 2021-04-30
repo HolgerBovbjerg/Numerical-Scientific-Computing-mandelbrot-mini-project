@@ -246,7 +246,7 @@ def export_figure_matplotlib(arr, f_name, dpi=200, resize_fact=1, plt_show=False
     Export array as figure in original resolution
     :param arr: array of image to save in original resolution
     :param f_name: name of file where to save figure
-    :param resize_fact: resize facter wrt shape of arr, in (0, np.infty)
+    :param resize_fact: resize fact0r wrt shape of arr, in (0, np.infty)
     :param dpi: dpi of your screen
     :param plt_show: show plot or not
     """
@@ -264,7 +264,7 @@ def export_figure_matplotlib(arr, f_name, dpi=200, resize_fact=1, plt_show=False
 
 
 def create_mesh(real_points: int, imag_points: int):
-    '''
+    """
     Generates a mesh of complex points from the complex
     plane, in the region: -2 < Re < 1  and -1.5 < Im < 1.5
     The resolution of the mesh is determined by the input values.
@@ -275,3 +275,4 @@ def create_mesh(real_points: int, imag_points: int):
     Re = np.array([np.linspace(-2, 1, real_points), ] * real_points)
     Im = np.array([np.linspace(-1.5, 1.5, imag_points), ] * imag_points).transpose()
     return Re + Im * 1j
+
