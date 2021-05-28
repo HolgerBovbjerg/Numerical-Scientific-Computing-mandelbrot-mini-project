@@ -71,18 +71,18 @@ def bar_plot(ax, data, colors=None, total_width=0.8, single_width=1, legend=True
 
 if __name__ == "__main__":
     # Barchart
-    f = h5py.File('all_data', 'r')
+    f = h5py.File('mandelbrot_data', 'r')
     group = f['times']
 
     data_bar_chart = {
-        'Cython_naive': [np.array(f['times']['Cython_naive'])[0]],
-        'Cython_vector': [np.array(f['times']['Cython_vector'])[0]],
-        'Distributed_vector': [np.array(f['times']['Distributed_vector'])[0]],
-        'GPU': [np.array(f['times']['GPU'])[0]],
-        'Multiprocessing_vector': [np.array(f['times']['Multiprocessing_vector'])[0]],
-        'Naive': [np.array(f['times']['Naive'])[0]],
-        'Numba': [np.array(f['times']['Numba'])[0]],
-        'Vectorized': [np.array(f['times']['Vectorized'])[0]],
+        'Cython_naive': [np.array(f['times']['Cython_implementation_using_naive_function'])],
+        'Cython_vector': [np.array(f['times']['Cython_implementation_using_vector_function'])],
+        'Distributed_vector': [np.array(f['times']['Distributed_vector_implementation'])],
+        'GPU': [np.array(f['times']['GPU_implementation'])],
+        'Multiprocessing_vector': [np.array(f['times']['Multiprocessing_implementation_using_vector_function'])],
+        'Naive': [np.array(f['times']['Naive_implementation'])],
+        'Numba': [np.array(f['times']['Numba_implementation'])],
+        'Vectorized': [np.array(f['times']['Vectorized_implementation'])],
     }
     fig, ax = plt.subplots()
     bar_plot(ax, data_bar_chart, total_width=.8, single_width=.9)
