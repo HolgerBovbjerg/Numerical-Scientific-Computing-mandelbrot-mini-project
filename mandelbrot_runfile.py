@@ -22,6 +22,18 @@ if __name__ == "__main__":
     # and the input/output data is saved to a HDF-file
     save_data = True
 
+    print('GPU implementation')
+    start = time.time()
+    heatmap_gpu = mf.mandelbrot_gpu(C, T, I)
+    GPU_time = (time.time() - start)
+    print(f'Execution time:{GPU_time:.2f} seconds\n')
+    plt.imshow(heatmap_gpu, cmap='hot', extent=[-2, 1, -1.5, 1.5])
+    plt.title(f'Implementation: GPU, Time: {GPU_time:.2f} seconds')
+    if save_data:
+        mf.export_figure_matplotlib(heatmap_gpu, 'Mandelbrot_gpu.pdf')
+    plt.show()
+
+
     print("Naive implementation")
     start = time.time()
     for i in range(numIter):
@@ -100,16 +112,7 @@ if __name__ == "__main__":
         mf.export_figure_matplotlib(heatmap_parallel, 'Mandelbrot_parallel.pdf')
     plt.show()
 
-    print('GPU implementation')
-    start = time.time()
-    heatmap_gpu = mf.mandelbrot_gpu(C, T, I)
-    GPU_time = (time.time() - start)
-    print(f'Execution time:{GPU_time:.2f} seconds\n')
-    plt.imshow(heatmap_gpu, cmap='hot', extent=[-2, 1, -1.5, 1.5])
-    plt.title(f'Implementation: GPU, Time: {GPU_time:.2f} seconds')
-    if save_data:
-        mf.export_figure_matplotlib(heatmap_gpu, 'Mandelbrot_gpu.pdf')
-    plt.show()
+
 
     print('Distributed vector implementation')
     processors = 12

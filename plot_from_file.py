@@ -97,6 +97,7 @@ if __name__ == "__main__":
     ax.set_ylabel('Average execution time, seconds')
     ax.set_title('Average execution time for 4096x4096 input')
     fig.show()
+    fig.savefig("bar_plot_times.pdf", dpi=200)
 
     # Size compare plot
     sizes = [4096, 2048, 1024, 512, 256]
@@ -115,9 +116,12 @@ if __name__ == "__main__":
     ax1.set_ylabel('Average execution time, seconds')
     ax1.set_title('Average execution time vs. size of input mesh')
     fig1.show()
+    fig1.savefig('line_plot_without_naive.pdf', dpi=200)
     ax2.legend()
     ax2.set_xlabel('Size of input in points')
     ax2.set_ylabel('Average execution time, seconds')
     ax2.set_title('Average execution time vs. size of input mesh')
     fig2.show()
+    fig2.savefig('line_plot_with_naive.pdf', dpi=200)
+
     f.close()
