@@ -36,6 +36,7 @@ def mandelbrot_naive(c: np.ndarray, T: int, I: int):
                 n[i, j] += 1
     return n / I
 
+
 def mandelbrot_vector(data: list):
     """
     Calculates the M(c) values in the c-mesh given,
@@ -275,4 +276,3 @@ def create_mesh(real_points: int, imag_points: int):
     Re = np.array([np.linspace(-2, 1, real_points), ] * real_points)
     Im = np.array([np.linspace(-1.5, 1.5, imag_points), ] * imag_points).transpose()
     return Re + Im * 1j
-
