@@ -11,7 +11,7 @@ import numba
 from numba import jit
 import matplotlib.pyplot as plt
 import pyopencl as cl
-import mandelbrot_cython as mc
+from Cython_files import mandelbrot_cython as mc
 from dask.distributed import Client, wait
 
 
