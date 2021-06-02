@@ -115,8 +115,8 @@ if __name__ == "__main__":
     parallel_vector_times = []
     for i in range(numIter):
         start = time.time()
-        # heatmap_parallel = mf.mandelbrot_parallel_vector(C, T, I, processors, 512, 8)
-        heatmap_parallel = mf.mandelbrot_parallel_vector(C, T, I, processors, 20, 5)
+        heatmap_parallel = mf.mandelbrot_parallel_vector(C, T, I, processors, 512, 8)
+        # heatmap_parallel = mf.mandelbrot_parallel_vector(C, T, I, processors, 20, 5)
         parallel_vector_times.append(time.time() - start)
     parallel_vector_mean_time = np.mean(parallel_vector_times)
     print(f'Execution time using {processors} cores: {parallel_vector_mean_time:.2f} seconds\n')
@@ -132,8 +132,8 @@ if __name__ == "__main__":
     distributed_vector_times = []
     for i in range(numIter):
         start = time.time()
-        # heatmap_dist_vec = mf.mandelbrot_distribu1ted_vector(C, T, I, processors, 512, 8)
-        heatmap_dist_vec = mf.mandelbrot_distributed_vector(C, T, I, processors, 20, 5)
+        heatmap_dist_vec = mf.mandelbrot_distributed_vector(C, T, I, processors, 512, 8)
+        # heatmap_dist_vec = mf.mandelbrot_distributed_vector(C, T, I, processors, 20, 5)
         distributed_vector_times.append(time.time() - start)
     distributed_vector_mean_time = np.mean(distributed_vector_times)
     print(f'Execution time using {processors} cores: {distributed_vector_mean_time:.2f} seconds\n')
@@ -145,7 +145,7 @@ if __name__ == "__main__":
 
 
     if save_data:
-        f = h5py.File('mandelbrot_data', 'w-')
+        f = h5py.File('mandelbrot_data', 'r+')
         input_group = f.create_group('input')
         input_group.create_dataset('complex_input_plane', data=C)
         input_group.create_dataset('threshold_value', data=T)
@@ -170,4 +170,5 @@ if __name__ == "__main__":
         time_group.create_dataset('Multiprocessing_implementation_using_vector_function', data=parallel_vector_times)
         time_group.create_dataset('GPU_implementation', data=GPU_times)
         time_group.create_dataset('Distributed_vector_implementation', data=distributed_vector_times)
+        
         f.close()
