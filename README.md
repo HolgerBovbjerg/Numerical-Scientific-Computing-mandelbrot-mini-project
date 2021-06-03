@@ -20,6 +20,6 @@ The runfile has a number of configuration settings which is:
 ## How to generate plots
 To generate plots the ```plot_from_file.py``` is used. 
 In order to run this file the two data files ```alldata``` and ```mandelbrot_data``` must be in the root folder. 
-```python mandelbrot_data``` can be found in a ```.zip``` file in the ```Data``` folder.
+The data files can be found as ```.zip``` files in the ```Data``` folder.
 
 
