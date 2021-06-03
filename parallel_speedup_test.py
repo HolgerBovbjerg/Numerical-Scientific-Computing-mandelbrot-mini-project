@@ -8,7 +8,7 @@ if __name__ == "__main__":
     I = 100
     T = 2
     C = mf.create_mesh(2**12, 2**12)
-    numIter = 10
+    numIter = 5
     
     # If save_data is true, the plots are saved to pdf-files
     # and the input/output data is saved to a HDF-file
@@ -27,11 +27,17 @@ if __name__ == "__main__":
 
     plt.plot([i+1 for i in range(12)], parallel_vector_time)
     plt.title('Time vs. processors')
+    plt.ylabel('Average execution time, seconds')
+    plt.xlabel('Number of processors')
+    plt.savefig('parallel_time_vs_processors.pdf')
     plt.show()
 
     speedup = [parallel_vector_time[0]/parallel_vector_time[i] for i in range(12)]
     plt.plot([i+1 for i in range(12)], speedup)
     plt.title('Speedup vs processors')
+    plt.ylabel('Speedup')
+    plt.xlabel('Number of processors')
+    plt.savefig('parallel_speedup_vs_processors.pdf')
     plt.show()
 
     if save_data:
