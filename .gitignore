@@ -5,3 +5,7 @@
 .__pycache__/
 .build/
 .dask-worker-space/
+*.bak
+*.ini
+*.lock
+*.pyc

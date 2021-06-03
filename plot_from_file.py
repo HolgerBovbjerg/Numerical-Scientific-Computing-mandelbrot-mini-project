@@ -1,6 +1,7 @@
 import h5py
 import matplotlib.pyplot as plt
 import numpy as np
+import mandelbrot_functions as mf
 
 
 def bar_plot(ax, data, colors=None, total_width=0.8, single_width=1, legend=True):
@@ -59,7 +60,7 @@ def bar_plot(ax, data, colors=None, total_width=0.8, single_width=1, legend=True
 
         # Draw a bar for every value of that type
         for x, y in enumerate(values):
-            bar = ax.bar(x + x_offset, y, width=bar_width * single_width, color=colors[index % len(colors)])
+            bar = ax.bar(x + x_offset, np.mean(y), width=bar_width * single_width, color=colors[index % len(colors)])
 
         # Add a handle to the last drawn bar, which we'll need for the legend
         bars.append(bar[0])
@@ -71,39 +72,71 @@ def bar_plot(ax, data, colors=None, total_width=0.8, single_width=1, legend=True
 
 if __name__ == "__main__":
     # Barchart
-    f = h5py.File('all_data', 'r')
+    f = h5py.File('mandelbrot_data', 'r')
     group = f['times']
 
-    data_bar_chart = {
-        'Cython_naive': [np.array(f['times']['Cython_naive'])[0]],
-        'Cython_vector': [np.array(f['times']['Cython_vector'])[0]],
-        'Distributed_vector': [np.array(f['times']['Distributed_vector'])[0]],
-        'GPU': [np.array(f['times']['GPU'])[0]],
-        'Multiprocessing_vector': [np.array(f['times']['Multiprocessing_vector'])[0]],
-        'Naive': [np.array(f['times']['Naive'])[0]],
-        'Numba': [np.array(f['times']['Numba'])[0]],
-        'Vectorized': [np.array(f['times']['Vectorized'])[0]],
+    data_heatmap = {
+        'Cython_naive': [np.array(f['outputs']['Cython_implementation_using_naive_function'])],
+        'Cython_vector': [np.array(f['outputs']['Cython_implementation_using_vector_function'])],
+        'Distributed_vector': [np.array(f['outputs']['Distributed_vector_implementation'])],
+        'GPU': [np.array(f['outputs']['GPU_implementation'])],
+        'Multiprocessing_vector': [np.array(f['outputs']['Multiprocessing_implementation_using_vector_function'])],
+        'Naive': [np.array(f['outputs']['Naive_implementation'])],
+        'Numba': [np.array(f['outputs']['Numba_implementation'])],
+        'Vectorized': [np.array(f['outputs']['Vectorized_implementation'])],
     }
+
+    data_times = {
+        'Cython_naive': [np.array(f['times']['Cython_implementation_using_naive_function'])],
+        'Cython_vector': [np.array(f['times']['Cython_implementation_using_vector_function'])],
+        'Distributed_vector': [np.array(f['times']['Distributed_vector_implementation'])],
+        'GPU': [np.array(f['times']['GPU_implementation'])],
+        'Multiprocessing_vector': [np.array(f['times']['Multiprocessing_implementation_using_vector_function'])],
+        'Naive': [np.array(f['times']['Naive_implementation'])],
+        'Numba': [np.array(f['times']['Numba_implementation'])],
+        'Vectorized': [np.array(f['times']['Vectorized_implementation'])],
+    }
+    
+    #%% heatmaps
+    titles = list(data_heatmap.keys())
+    times = list(data_times.values())
+    for i, v in enumerate(data_heatmap.values()):
+        mf.export_figure_matplotlib(v[0],
+                                    "Mandelbrot_" + titles[i] + ".pdf",
+                                    title = f'{titles[i]}, Time: {np.mean(times[i]):.2f} [s]')
+    
+    #%% Barchart all
     fig, ax = plt.subplots()
-    bar_plot(ax, data_bar_chart, total_width=.8, single_width=.9)
+    bar_plot(ax, data_times, total_width=.8, single_width=.9)
     ax.tick_params(
         axis='x',  # changes apply to the x-axis
         which='both',  # both major and minor ticks are affected
         bottom=False,  # ticks along the bottom edge are off
         top=False,  # ticks along the top edge are off
         labelbottom=False)  # labels along the bottom edge are off
-    for i, v in enumerate(data_bar_chart.values()):
-        ax.text(i * 0.1 - 0.39, v[0]+1.25, str(round(v[0], 2)), color='blue', fontweight='bold')
-    ax.set_ylabel('Average execution time, seconds')
+    for i, v in enumerate(data_times.values()):
+        ax.text(i * 0.1 - 0.39, np.mean(v[0])+1.25,
+                str(round(np.mean(v[0]), 2)),
+                color='black',
+                fontweight='bold')
+    ax.set_ylabel('Average execution time [s]')
     ax.set_title('Average execution time for 4096x4096 input')
-    fig.show()
+    plt.show()
     fig.savefig("bar_plot_times.pdf", dpi=200)
-
+    f.close()
+      
+      
+    #%% Line plots varying mesh size  
+    f = h5py.File('all_data', 'r')
+    group = f['times']
     # Size compare plot
     sizes = [4096, 2048, 1024, 512, 256]
     fig1, ax1 = plt.subplots()
     fig2, ax2 = plt.subplots()
     for (key, value) in group.items():
+        print(key)
+        print(np.array(value))
+        
         if key == 'Naive':
             ax2.plot(sizes, np.array(value), label=key)
         elif key == 'Vectorized':
@@ -113,15 +146,15 @@ if __name__ == "__main__":
             ax1.plot(sizes, np.array(value), label=key)
     ax1.legend()
     ax1.set_xlabel('Size of input in points')
-    ax1.set_ylabel('Average execution time, seconds')
+    ax1.set_ylabel('Average execution time [s]')
     ax1.set_title('Average execution time vs. size of input mesh')
-    fig1.show()
+    # fig1.show()
     fig1.savefig('line_plot_without_naive.pdf', dpi=200)
     ax2.legend()
     ax2.set_xlabel('Size of input in points')
-    ax2.set_ylabel('Average execution time, seconds')
+    ax2.set_ylabel('Average execution time [s]')
     ax2.set_title('Average execution time vs. size of input mesh')
-    fig2.show()
+    # fig2.show()
     fig2.savefig('line_plot_with_naive.pdf', dpi=200)
 
     f.close()
