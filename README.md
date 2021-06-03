@@ -17,6 +17,10 @@ The runfile has a number of configuration settings which is:
 * Size of C-mesh ```C```
 * Number of timing runs ```numIter```
 
+## How to use test script
+To test the functionality of the implkemented mandelbrot function ```unittest``` has been used.
+The test script is found in ```test_suite.py``` which can be run and the functions are then tested against the naive implementation.
+
 ## How to generate plots
 To generate plots the ```plot_from_file.py``` is used. 
 In order to run this file the two data files ```parallel_speedup_data``` and ```mandelbrot_data``` must be in the root folder. 
