@@ -127,7 +127,7 @@ if __name__ == "__main__":
       
       
     #%% Line plots varying mesh size  
-    f = h5py.File('all_data', 'r')
+    f = h5py.File('parallel_speedup_data', 'r')
     group = f['times']
     # Size compare plot
     sizes = [4096, 2048, 1024, 512, 256]
